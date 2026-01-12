@@ -18,7 +18,7 @@ spec:
           command: ['sh', '-c', 'until nc -z blog-postgres-rw 5432; do echo waiting for database; sleep 2; done']
       containers:
         - name: init
-          image: ghcr.io/samuka007/orm-vs-pgrest-example-migrate
+          image: ghcr.io/samuka007/orm-vs-pgrest-example-migrate:sha-1e40d02
           env:
             - name: DATABASE_URL
               valueFrom:
