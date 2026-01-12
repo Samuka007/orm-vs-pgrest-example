@@ -10,7 +10,6 @@ spec:
   ttlSecondsAfterFinished: 300
   template:
     spec:
-      restartPolicy: OnFailure
       initContainers:
         # 等待数据库就绪
         - name: wait-for-db
