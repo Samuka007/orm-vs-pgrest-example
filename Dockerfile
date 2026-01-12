@@ -35,7 +35,8 @@ ARG NEXT_PUBLIC_APP_URL=https://cmp-k8s-argocd-au.samuka007.com
 ENV NEXT_PUBLIC_POSTGREST_URL=${NEXT_PUBLIC_POSTGREST_URL}
 ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
 
-# 生成 Prisma Client
+# 生成 Prisma Client（需要 DATABASE_URL 但不实际连接）
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 RUN pnpm db:generate
 
 # 构建 Next.js
@@ -54,9 +55,11 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # 复制必要文件
-COPY --from=builder /app/public ./public
+# 如果存在 public 目录则复制，否则创建空目录
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
+# 创建空的 public 目录（如果项目有 public 目录，需要取消下面的注释）
+RUN mkdir -p ./public
 
 # 设置权限
 RUN chown -R nextjs:nodejs /app

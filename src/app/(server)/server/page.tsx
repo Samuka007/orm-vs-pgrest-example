@@ -6,6 +6,9 @@
 import { getPosts } from '@/lib/server'
 import { PostList } from '@/components/ui/PostList'
 
+// 强制动态渲染，避免构建时预渲染（需要数据库连接）
+export const dynamic = 'force-dynamic'
+
 export default async function ServerHomePage() {
   // 获取文章列表
   const { data: posts, total } = await getPosts({

@@ -14,6 +14,9 @@ COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 COPY prisma.config.ts ./
 
+# 设置假的 DATABASE_URL 以通过 postinstall 的 prisma generate
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+
 # 安装依赖（包括 devDependencies）
 RUN pnpm install --frozen-lockfile
 
