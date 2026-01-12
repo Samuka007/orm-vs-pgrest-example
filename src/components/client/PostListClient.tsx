@@ -6,7 +6,6 @@
 // ===========================================
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { usePosts, type UsePostsOptions } from '@/hooks'
 import type { PostWithAuthor } from '@/types'
 import { PostListSkeleton } from './LoadingSkeleton'
@@ -14,8 +13,6 @@ import { PostListSkeleton } from './LoadingSkeleton'
 interface PostListClientProps {
   /** 初始查询选项 */
   initialOptions?: UsePostsOptions
-  /** 链接前缀 */
-  linkPrefix?: string
   /** 空状态提示文本 */
   emptyText?: string
   /** 是否显示分页 */
@@ -37,13 +34,7 @@ function formatDate(date: Date | null): string {
 /**
  * 客户端文章卡片组件
  */
-function ClientPostCard({
-  post,
-  linkPrefix = '/client',
-}: {
-  post: PostWithAuthor
-  linkPrefix?: string
-}) {
+function ClientPostCard({ post }: { post: PostWithAuthor }) {
   return (
     <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* 封面图片 */}
@@ -60,12 +51,7 @@ function ClientPostCard({
       <div className="p-6">
         {/* 标题 */}
         <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
-          <Link
-            href={`${linkPrefix}/posts/${post.id}`}
-            className="hover:text-blue-600 transition-colors"
-          >
-            {post.title}
-          </Link>
+          {post.title}
         </h2>
 
         {/* 摘要 */}
@@ -254,7 +240,6 @@ function ClientPagination({
  */
 export function PostListClient({
   initialOptions = {},
-  linkPrefix = '/client',
   emptyText = '暂无文章',
   showPagination = true,
 }: PostListClientProps) {
@@ -338,7 +323,7 @@ export function PostListClient({
       {/* 文章网格 */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {posts.map((post) => (
-          <ClientPostCard key={post.id} post={post} linkPrefix={linkPrefix} />
+          <ClientPostCard key={post.id} post={post} />
         ))}
       </div>
 

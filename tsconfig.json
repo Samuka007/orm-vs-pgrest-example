@@ -24,7 +24,6 @@
       "@/lib/*": ["./src/lib/*"],
       "@/types/*": ["./src/types/*"]
     },
-    "baseUrl": "."
   },
   "include": [
     "next-env.d.ts",

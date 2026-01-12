@@ -28,17 +28,3 @@ export {
   type CategoryWithPostCount,
   type UseCategoriesWithPostCountReturn,
 } from './use-categories'
-
-// ===========================================
-// 评论相关 Hooks
-// ===========================================
-
-export {
-  useComments,
-  useAddComment,
-  useCommentsWithOptimisticUpdate,
-  type UseCommentsReturn,
-  type AddCommentInput,
-  type UseAddCommentReturn,
-  type UseCommentsWithOptimisticUpdateReturn,
-} from './use-comments'

@@ -8,8 +8,6 @@ import { PostCard } from './PostCard'
 
 interface PostListProps {
   posts: PostWithRelations[]
-  /** 链接前缀，用于区分不同路由组 */
-  linkPrefix?: string
   /** 空状态提示文本 */
   emptyText?: string
 }
@@ -19,7 +17,6 @@ interface PostListProps {
  */
 export function PostList({
   posts,
-  linkPrefix = '/server',
   emptyText = '暂无文章',
 }: PostListProps) {
   if (posts.length === 0) {
@@ -46,7 +43,7 @@ export function PostList({
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} linkPrefix={linkPrefix} />
+        <PostCard key={post.id} post={post} />
       ))}
     </div>
   )

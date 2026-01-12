@@ -43,32 +43,12 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
                 <Link
                   href="/client"
                   className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    isActive('/client') && pathname === '/client'
+                    pathname === '/client'
                       ? 'text-blue-600 bg-blue-50'
                       : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
                   }`}
                 >
                   首页
-                </Link>
-                <Link
-                  href="/client/posts"
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    isActive('/client/posts')
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
-                >
-                  文章
-                </Link>
-                <Link
-                  href="/client/categories"
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                    isActive('/client/categories')
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-                  }`}
-                >
-                  分类
                 </Link>
               </div>
             </div>
@@ -88,32 +68,12 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
             <Link
               href="/client"
               className={`flex-1 text-center px-3 py-2 text-sm font-medium rounded-md ${
-                isActive('/client') && pathname === '/client'
+                pathname === '/client'
                   ? 'text-blue-600 bg-blue-50'
                   : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
               }`}
             >
               首页
-            </Link>
-            <Link
-              href="/client/posts"
-              className={`flex-1 text-center px-3 py-2 text-sm font-medium rounded-md ${
-                isActive('/client/posts')
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-              }`}
-            >
-              文章
-            </Link>
-            <Link
-              href="/client/categories"
-              className={`flex-1 text-center px-3 py-2 text-sm font-medium rounded-md ${
-                isActive('/client/categories')
-                  ? 'text-blue-600 bg-blue-50'
-                  : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
-              }`}
-            >
-              分类
             </Link>
           </div>
         </div>

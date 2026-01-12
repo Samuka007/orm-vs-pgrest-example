@@ -19,20 +19,3 @@ export {
   getCategory,
 } from './categories'
 export type { CategoryWithPostCount } from './categories'
-
-// 评论相关
-export {
-  getComments,
-  getCommentsWithReplies,
-  getCommentCount,
-  getComment,
-} from './comments'
-
-// 统计相关
-export {
-  getPopularPosts,
-  getRecentPosts,
-  getMostViewedPosts,
-  getPostStats,
-} from './stats'
-export type { PostStats, PopularPost } from './stats'

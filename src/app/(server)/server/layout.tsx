@@ -33,18 +33,6 @@ export default function ServerLayout({ children }: ServerLayoutProps) {
                 >
                   首页
                 </Link>
-                <Link
-                  href="/server/posts"
-                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
-                >
-                  文章
-                </Link>
-                <Link
-                  href="/server/categories"
-                  className="px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors"
-                >
-                  分类
-                </Link>
               </div>
             </div>
 
@@ -65,18 +53,6 @@ export default function ServerLayout({ children }: ServerLayoutProps) {
               className="flex-1 text-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
             >
               首页
-            </Link>
-            <Link
-              href="/server/posts"
-              className="flex-1 text-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
-            >
-              文章
-            </Link>
-            <Link
-              href="/server/categories"
-              className="flex-1 text-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md"
-            >
-              分类
             </Link>
           </div>
         </div>

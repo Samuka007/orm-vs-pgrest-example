@@ -61,12 +61,6 @@ export default function RootLayout({
                 {/* 导航链接 */}
                 <div className="hidden items-center gap-6 md:flex">
                   <a
-                    href="/compare"
-                    className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                  >
-                    方案对比
-                  </a>
-                  <a
                     href="/client"
                     className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                   >

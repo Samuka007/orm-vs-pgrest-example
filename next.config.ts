@@ -4,11 +4,8 @@ const nextConfig: NextConfig = {
   // 启用严格模式
   reactStrictMode: true,
 
-  // 实验性功能
-  experimental: {
-    // 启用 TypeScript 插件
-    typedRoutes: true,
-  },
+  // 启用类型化路由（已从 experimental 移出成为稳定功能）
+  typedRoutes: true,
 
   // 图片优化配置
   images: {

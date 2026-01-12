@@ -3,14 +3,11 @@
 // 用于展示文章摘要信息
 // ===========================================
 
-import Link from 'next/link'
 import type { PostWithRelations } from '@/types'
 import { CategoryBadge } from './CategoryBadge'
 
 interface PostCardProps {
   post: PostWithRelations
-  /** 链接前缀，用于区分不同路由组 */
-  linkPrefix?: string
 }
 
 /**
@@ -28,7 +25,7 @@ function formatDate(date: Date | null): string {
 /**
  * 文章卡片组件
  */
-export function PostCard({ post, linkPrefix = '/server' }: PostCardProps) {
+export function PostCard({ post }: PostCardProps) {
   return (
     <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* 封面图片 */}
@@ -62,12 +59,7 @@ export function PostCard({ post, linkPrefix = '/server' }: PostCardProps) {
 
         {/* 标题 */}
         <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
-          <Link
-            href={`${linkPrefix}/posts/${post.id}`}
-            className="hover:text-blue-600 transition-colors"
-          >
-            {post.title}
-          </Link>
+          {post.title}
         </h2>
 
         {/* 摘要 */}
