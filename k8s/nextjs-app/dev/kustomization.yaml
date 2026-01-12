@@ -16,6 +16,6 @@ commonLabels:
 
 images:
   - name: ghcr.io/samuka007/orm-vs-pgrest-example
-    newTag: sha-389d038
+    newTag: sha-dab3abb
   - name: ghcr.io/samuka007/orm-vs-pgrest-example-migrate
-    newTag: sha-389d038
+    newTag: sha-dab3abb
