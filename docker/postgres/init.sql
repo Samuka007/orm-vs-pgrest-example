@@ -1,23 +1,11 @@
 -- ===========================================
 -- PostgreSQL 初始化脚本
 -- 用于 PostgREST 配置
+-- 注意：角色 web_anon 和 authenticator 已在 CNPG cluster 初始化时创建
 -- ===========================================
 
 -- 创建 api schema（PostgREST 使用）
 CREATE SCHEMA IF NOT EXISTS api;
-
--- ===========================================
--- 创建角色
--- ===========================================
-
--- web_anon: 匿名访问角色（只读权限）
-CREATE ROLE web_anon NOLOGIN;
-
--- authenticator: PostgREST 连接角色
-CREATE ROLE authenticator NOINHERIT LOGIN PASSWORD 'postgres';
-
--- 授予 authenticator 切换到 web_anon 的权限
-GRANT web_anon TO authenticator;
 
 -- ===========================================
 -- 授予 schema 权限
@@ -71,6 +59,4 @@ $$ LANGUAGE plpgsql;
 -- ===========================================
 
 COMMENT ON SCHEMA api IS 'PostgREST API schema - 用于暴露 REST API';
-COMMENT ON ROLE web_anon IS 'PostgREST 匿名访问角色 - 只读权限';
-COMMENT ON ROLE authenticator IS 'PostgREST 连接角色 - 用于数据库连接';
 COMMENT ON FUNCTION grant_web_anon_select() IS '授予 web_anon 对所有现有表的 SELECT 权限，在 Prisma 迁移后运行';

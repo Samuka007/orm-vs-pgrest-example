@@ -19,6 +19,11 @@ spec:
     initdb:
       database: blog_db
       owner: blog_user
+      postInitSQL:
+        - CREATE ROLE web_anon NOLOGIN
+        - CREATE ROLE authenticator NOINHERIT LOGIN PASSWORD 'postgrest_password'
+        - GRANT web_anon TO authenticator
+        - GRANT web_anon TO blog_user
   
   resources:
     requests:
