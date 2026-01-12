@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: cmp-dev-1
+
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "3" # 第三阶段：部署 PostgREST 服务
+
+resources:
+- deployment.yaml
+- service.yaml
+- ingress.yaml
+
+labels:
+- includeSelectors: true
+  pairs:
+    app: postgrest
+    app.kubernetes.io/component: api

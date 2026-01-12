@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: postgrest
   namespace: cmp-dev-1
+
 spec:
   replicas: 1
   selector:

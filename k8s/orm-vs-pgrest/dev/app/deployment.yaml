@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: nextjs
-          image: ghcr.io/samuka007/orm-vs-pgrest-example:sha-389d038
+          image: ghcr.io/samuka007/orm-vs-pgrest-example:main
           ports:
             - containerPort: 3000
           env:

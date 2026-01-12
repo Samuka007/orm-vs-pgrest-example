@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/Samuka007/orm-vs-pgrest-example.git
     targetRevision: main
-    path: k8s/nextjs-app/dev
+    path: k8s/orm-vs-pgrest/dev
     kustomize:
       namespace: cmp-dev-1
   destination:

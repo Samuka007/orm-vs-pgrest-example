@@ -3,6 +3,8 @@ kind: Cluster
 metadata:
   name: blog-postgres
   namespace: cmp-dev-1
+  annotations:
+    argocd.argoproj.io/sync-wave: "0" # 第一阶段：部署数据库
 spec:
   instances: 1
   
