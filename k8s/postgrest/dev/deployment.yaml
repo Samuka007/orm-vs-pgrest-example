@@ -70,6 +70,8 @@ spec:
               value: "web_anon"
             - name: PGRST_SERVER_PORT
               value: "3000"
+            - name: PGRST_ADMIN_SERVER_PORT
+              value: "3001"
           resources:
             requests:
               memory: "64Mi"
@@ -80,14 +82,14 @@ spec:
           livenessProbe:
             httpGet:
               path: /live
-              port: 3000
+              port: 3001
             initialDelaySeconds: 10
             periodSeconds: 10
             failureThreshold: 6
           readinessProbe:
             httpGet:
               path: /ready
-              port: 3000
+              port: 3001
             initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 3
