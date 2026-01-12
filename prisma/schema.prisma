@@ -1,0 +1,134 @@
+// ===========================================
+// Prisma Schema 配置
+// 博客内容管理系统数据模型
+// ===========================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["public"]
+}
+
+// ===========================================
+// 枚举类型
+// ===========================================
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+
+  @@schema("public")
+}
+
+// ===========================================
+// 数据模型
+// ===========================================
+
+/// 用户模型
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String
+  avatarUrl String?   @map("avatar_url")
+  bio       String?
+  posts     Post[]
+  comments  Comment[]
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+  @@schema("public")
+}
+
+/// 分类模型
+model Category {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  slug        String  @unique
+  description String?
+  sortOrder   Int     @default(0) @map("sort_order")
+  posts       Post[]
+
+  @@map("categories")
+  @@schema("public")
+}
+
+/// 标签模型
+model Tag {
+  id    String    @id @default(uuid())
+  name  String    @unique
+  slug  String    @unique
+  color String?
+  posts PostTag[]
+
+  @@map("tags")
+  @@schema("public")
+}
+
+/// 文章模型
+model Post {
+  id          String     @id @default(uuid())
+  title       String
+  slug        String     @unique
+  content     String
+  excerpt     String?
+  coverImage  String?    @map("cover_image")
+  status      PostStatus @default(DRAFT)
+  viewCount   Int        @default(0) @map("view_count")
+  publishedAt DateTime?  @map("published_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  author     User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId   String    @map("author_id")
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId String?   @map("category_id")
+  tags       PostTag[]
+  comments   Comment[]
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([publishedAt(sort: Desc)])
+  @@map("posts")
+  @@schema("public")
+}
+
+/// 文章-标签关联模型（多对多）
+model PostTag {
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String @map("post_id")
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId  String @map("tag_id")
+
+  @@id([postId, tagId])
+  @@map("post_tags")
+  @@schema("public")
+}
+
+/// 评论模型（支持嵌套评论）
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId   String    @map("post_id")
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId String    @map("author_id")
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId String?   @map("parent_id")
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@index([parentId])
+  @@map("comments")
+  @@schema("public")
+}
