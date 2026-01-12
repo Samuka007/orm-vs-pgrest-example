@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: blog-nextjs-dev
+  name: blog-nextjs-dev-1
   namespace: argocd
 spec:
   project: default

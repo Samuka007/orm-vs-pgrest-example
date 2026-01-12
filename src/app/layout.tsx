@@ -79,7 +79,7 @@ export default function RootLayout({
               {/* 右侧操作区 */}
               <div className="flex items-center gap-4">
                 <a
-                  href="https://github.com"
+                  href="https://github.com/Samuka007/orm-vs-pgrest-example"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
