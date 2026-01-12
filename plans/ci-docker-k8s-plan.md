@@ -435,7 +435,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: blog-postgres
-  namespace: cmp-dev
+  namespace: cmp-dev-1
 spec:
   instances: 1
   
@@ -467,7 +467,7 @@ spec:
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: cmp-dev
+namespace: cmp-dev-1
 
 resources:
   - cluster.yaml
@@ -487,7 +487,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgrest
-  namespace: cmp-dev
+  namespace: cmp-dev-1
 spec:
   replicas: 1
   selector:
@@ -542,7 +542,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgrest
-  namespace: cmp-dev
+  namespace: cmp-dev-1
 spec:
   type: ClusterIP
   ports:
@@ -559,7 +559,7 @@ spec:
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: cmp-dev
+namespace: cmp-dev-1
 
 resources:
   - deployment.yaml
@@ -581,7 +581,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: db-init
-  namespace: cmp-dev
+  namespace: cmp-dev-1
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
@@ -612,7 +612,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nextjs-app
-  namespace: cmp-dev
+  namespace: cmp-dev-1
 spec:
   replicas: 1
   selector:
@@ -661,7 +661,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nextjs-app
-  namespace: cmp-dev
+  namespace: cmp-dev-1
 spec:
   type: ClusterIP
   ports:
@@ -679,7 +679,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nextjs-app
-  namespace: cmp-dev
+  namespace: cmp-dev-1
   annotations:
     kubernetes.io/ingress.class: cloudflare-tunnel
     cloudflare-tunnel-ingress-controller.strrl.dev/backend-protocol: http
@@ -702,7 +702,7 @@ spec:
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: cmp-dev
+namespace: cmp-dev-1
 
 resources:
   - db-init-job.yaml
@@ -758,7 +758,7 @@ spec:
     path: k8s/postgres-cluster/dev
   destination:
     server: https://kubernetes.default.svc
-    namespace: cmp-dev
+    namespace: cmp-dev-1
   syncPolicy:
     automated:
       prune: true
@@ -780,7 +780,7 @@ spec:
     path: k8s/postgrest/dev
   destination:
     server: https://kubernetes.default.svc
-    namespace: cmp-dev
+    namespace: cmp-dev-1
   syncPolicy:
     automated:
       prune: true
@@ -802,7 +802,7 @@ spec:
     path: k8s/nextjs-app/dev
   destination:
     server: https://kubernetes.default.svc
-    namespace: cmp-dev
+    namespace: cmp-dev-1
   syncPolicy:
     automated:
       prune: true

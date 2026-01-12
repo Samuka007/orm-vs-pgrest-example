@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: postgrest
-  namespace: cmp-dev
+  namespace: cmp-dev-1
   annotations:
     kubernetes.io/ingress.class: cloudflare-tunnel
     cloudflare-tunnel-ingress-controller.strrl.dev/backend-protocol: http

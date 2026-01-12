@@ -2,7 +2,7 @@ apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
   name: blog-postgres
-  namespace: cmp-dev
+  namespace: cmp-dev-1
 spec:
   instances: 1
   

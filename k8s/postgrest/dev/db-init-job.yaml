@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: db-init-postgrest
-  namespace: cmp-dev
+  namespace: cmp-dev-1
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
@@ -10,6 +10,7 @@ spec:
   ttlSecondsAfterFinished: 300
   template:
     spec:
+      restartPolicy: Never
       initContainers:
         # 等待数据库就绪
         - name: wait-for-db
