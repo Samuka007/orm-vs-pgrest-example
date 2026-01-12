@@ -45,51 +45,116 @@
 
 ```typescript
 // src/hooks/use-posts.ts
-import { useEffect, useState } from 'react'
-import { postgrest, getPaginationRange } from '@/lib/postgrest'
-import type { PostWithAuthor, PaginatedResult } from '@/types'
+import { useState, useEffect, useCallback } from 'react'
+import {
+  postgrest,
+  getPaginationRange,
+  DEFAULT_PAGE_SIZE,
+  type DbPostWithAuthor,
+} from '@/lib/postgrest'
+import type { PostWithAuthor } from '@/types'
+import type { Enums } from '@/types/database'
 
-export function usePosts(page: number = 1, pageSize: number = 10) {
-  const [data, setData] = useState<PaginatedResult<PostWithAuthor> | null>(null)
-  const [loading, setLoading] = useState(true)
+/** 文章列表查询参数 */
+export interface UsePostsOptions {
+  page?: number
+  pageSize?: number
+  status?: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED'
+  categorySlug?: string
+  tagSlug?: string
+  authorId?: string
+  search?: string
+  orderBy?: 'published_at' | 'view_count' | 'title' | 'created_at'
+  order?: 'asc' | 'desc'
+}
+
+export function usePosts(options: UsePostsOptions = {}) {
+  const {
+    page = 1,
+    pageSize = DEFAULT_PAGE_SIZE,
+    status = 'PUBLISHED',
+    categorySlug,
+    orderBy = 'published_at',
+    order = 'desc',
+  } = options
+
+  const [data, setData] = useState<PostWithAuthor[]>([])
+  const [total, setTotal] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isError, setIsError] = useState(false)
   const [error, setError] = useState<Error | null>(null)
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      setLoading(true)
-      try {
-        const [start, end] = getPaginationRange(page, pageSize)
-        
-        const { data: posts, count, error } = await postgrest
-          .from('posts')
-          .select(`
-            *,
-            author:users(id, name, avatar_url)
-          `, { count: 'exact' })
-          .eq('status', 'PUBLISHED')
-          .order('published_at', { ascending: false })
-          .range(start, end)
+  const fetchPosts = useCallback(async () => {
+    setIsLoading(true)
+    setIsError(false)
+    setError(null)
 
-        if (error) throw error
+    try {
+      let query = postgrest
+        .from('posts')
+        .select(`
+          *,
+          author:users!posts_author_id_fkey(id, name, avatar_url)
+        `, { count: 'exact' })
 
-        setData({
-          data: posts ?? [],
-          total: count ?? 0,
-          page,
-          pageSize,
-          totalPages: Math.ceil((count ?? 0) / pageSize)
-        })
-      } catch (err) {
-        setError(err as Error)
-      } finally {
-        setLoading(false)
+      // 状态过滤
+      if (status) {
+        query = query.eq('status', status as Enums<'PostStatus'>)
       }
+
+      // 分类过滤（需要先查询分类 ID）
+      if (categorySlug) {
+        const { data: category } = await postgrest
+          .from('categories')
+          .select('id')
+          .eq('slug', categorySlug)
+          .single()
+
+        if (category) {
+          query = query.eq('category_id', category.id)
+        }
+      }
+
+      // 排序和分页
+      query = query.order(orderBy, { ascending: order === 'asc' })
+      const [start, end] = getPaginationRange(page, pageSize)
+      query = query.range(start, end)
+
+      const { data: posts, count, error: queryError } = await query
+
+      if (queryError) throw new Error(queryError.message)
+
+      // 转换数据（snake_case → camelCase）
+      const transformedPosts = (posts as unknown as DbPostWithAuthor[])
+        .map(transformPostWithAuthor)
+
+      setData(transformedPosts)
+      setTotal(count ?? 0)
+    } catch (err) {
+      setIsError(true)
+      setError(err instanceof Error ? err : new Error('获取文章列表失败'))
+    } finally {
+      setIsLoading(false)
     }
+  }, [page, pageSize, status, categorySlug, orderBy, order])
 
+  useEffect(() => {
     fetchPosts()
-  }, [page, pageSize])
+  }, [fetchPosts])
 
-  return { data, loading, error }
+  const totalPages = Math.ceil(total / pageSize)
+
+  return {
+    data,
+    total,
+    page,
+    pageSize,
+    totalPages,
+    isLoading,
+    isError,
+    error,
+    refresh: fetchPosts,
+  }
 }
 ```
 
@@ -98,33 +163,62 @@ export function usePosts(page: number = 1, pageSize: number = 10) {
 ```typescript
 // src/lib/server/posts.ts
 import { prisma } from '@/lib/prisma'
-import type { PostWithAuthor, PaginatedResult } from '@/types'
+import { Prisma } from '@prisma/client'
+import type { PostWithRelations, PostQueryParams, PaginatedResult } from '@/types'
 
 export async function getPosts(
-  page: number = 1,
-  pageSize: number = 10
-): Promise<PaginatedResult<PostWithAuthor>> {
+  options: PostQueryParams = {}
+): Promise<PaginatedResult<PostWithRelations>> {
+  const {
+    page = 1,
+    pageSize = 10,
+    status = 'PUBLISHED',
+    categorySlug,
+    tagSlug,
+    authorId,
+    search,
+    orderBy = 'publishedAt',
+    order = 'desc',
+  } = options
+
+  // 构建查询条件
+  const where: Prisma.PostWhereInput = {}
+
+  if (status) where.status = status
+  if (categorySlug) where.category = { slug: categorySlug }
+  if (tagSlug) where.tags = { some: { tag: { slug: tagSlug } } }
+  if (authorId) where.authorId = authorId
+  if (search) {
+    where.OR = [
+      { title: { contains: search, mode: 'insensitive' } },
+      { content: { contains: search, mode: 'insensitive' } },
+    ]
+  }
+
+  // 执行查询
   const [posts, total] = await Promise.all([
     prisma.post.findMany({
-      where: { status: 'PUBLISHED' },
+      where,
       include: {
         author: {
           select: { id: true, name: true, avatarUrl: true }
-        }
+        },
+        category: true,
+        tags: { include: { tag: true } },
       },
-      orderBy: { publishedAt: 'desc' },
+      orderBy: { [orderBy]: order },
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
-    prisma.post.count({ where: { status: 'PUBLISHED' } })
+    prisma.post.count({ where }),
   ])
 
   return {
-    data: posts,
+    data: posts as PostWithRelations[],
     total,
     page,
     pageSize,
-    totalPages: Math.ceil(total / pageSize)
+    totalPages: Math.ceil(total / pageSize),
   }
 }
 ```
@@ -133,8 +227,10 @@ export async function getPosts(
 
 | 维度 | Client 端 | Server 端 |
 |------|----------|----------|
-| 代码量 | 较多（需要状态管理） | 较少（直接返回数据） |
-| 类型安全 | 需要手动定义类型 | 自动推断类型 |
+| 代码量 | 较多（需要状态管理 + 数据转换） | 较少（直接返回数据） |
+| 类型安全 | 需要手动定义类型 + 转换函数 | Prisma 自动推断类型 |
+| 查询构建 | 链式调用，字符串模板 | 对象结构，IDE 完整提示 |
+| 字段命名 | snake_case（需转换） | camelCase（直接使用） |
 | 错误处理 | 需要手动处理 | 可统一处理 |
 | 缓存 | 需要手动实现 | Next.js 自动缓存 |
 
@@ -145,42 +241,82 @@ export async function getPosts(
 #### Client 端实现
 
 ```typescript
-// 使用 PostgREST 的嵌入查询
-const fetchPostDetail = async (id: string) => {
-  const { data, error } = await postgrest
-    .from('posts')
-    .select(`
-      *,
-      author:users(id, name, avatar_url, bio),
-      category:categories(id, name, slug),
-      tags:post_tags(
-        tag:tags(id, name, slug, color)
-      )
-    `)
-    .eq('id', id)
-    .single()
+// src/hooks/use-posts.ts - usePost hook
+export function usePost(idOrSlug: string) {
+  const [data, setData] = useState<PostWithRelations | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
 
-  if (error) throw error
-  return data
+  const fetchPost = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      // 判断是 ID 还是 slug
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug)
+      const filterField = isUUID ? 'id' : 'slug'
+
+      // 查询文章基本信息、作者和分类
+      const { data: post, error: postError } = await postgrest
+        .from('posts')
+        .select(`
+          *,
+          author:users!posts_author_id_fkey(id, name, avatar_url),
+          category:categories(id, name, slug, description, sort_order)
+        `)
+        .eq(filterField, idOrSlug)
+        .single()
+
+      if (postError) throw new Error(postError.message)
+
+      // 单独查询文章标签（PostgREST 嵌套查询限制）
+      const { data: postTags } = await postgrest
+        .from('post_tags')
+        .select(`tag:tags(id, name, slug, color)`)
+        .eq('post_id', post.id)
+
+      // 组合并转换数据
+      const fullPost = { ...post, tags: postTags ?? [] }
+      setData(transformPostWithRelations(fullPost))
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('获取文章详情失败'))
+    } finally {
+      setIsLoading(false)
+    }
+  }, [idOrSlug])
+
+  useEffect(() => { fetchPost() }, [fetchPost])
+
+  return { data, isLoading, error, refresh: fetchPost }
 }
 ```
 
 #### Server 端实现
 
 ```typescript
-// 使用 Prisma 的 include
-const getPostDetail = async (id: string) => {
+// src/lib/server/posts.ts
+export async function getPost(id: string): Promise<PostWithRelations | null> {
   return prisma.post.findUnique({
     where: { id },
     include: {
       author: {
-        select: { id: true, name: true, avatarUrl: true, bio: true }
+        select: { id: true, name: true, avatarUrl: true }
       },
       category: true,
-      tags: {
-        include: { tag: true }
-      }
-    }
+      tags: { include: { tag: true } },
+    },
+  })
+}
+
+// 通过 slug 获取文章
+export async function getPostBySlug(slug: string): Promise<PostWithRelations | null> {
+  return prisma.post.findUnique({
+    where: { slug },
+    include: {
+      author: {
+        select: { id: true, name: true, avatarUrl: true }
+      },
+      category: true,
+      tags: { include: { tag: true } },
+    },
   })
 }
 ```
@@ -189,9 +325,11 @@ const getPostDetail = async (id: string) => {
 
 | 维度 | Client 端 | Server 端 |
 |------|----------|----------|
-| 查询语法 | 字符串模板，易出错 | 对象结构，IDE 提示 |
-| 类型推断 | 需要手动定义 | 完全自动推断 |
-| 字段映射 | 使用数据库字段名（snake_case） | 使用模型字段名（camelCase） |
+| 查询语法 | 字符串模板，易出错 | 对象结构，IDE 完整提示 |
+| 类型推断 | 需要手动定义 + 转换 | 完全自动推断 |
+| 字段映射 | snake_case（需转换为 camelCase） | camelCase（直接使用） |
+| 嵌套查询 | 有限制，可能需要多次请求 | 完整支持，单次查询 |
+| ID/Slug 查询 | 需要手动判断 | 直接使用不同方法 |
 
 ---
 
@@ -342,28 +480,47 @@ export async function getPostStatsByCategory() {
 #### Client 端实现
 
 ```typescript
-// PostgREST 聚合能力有限，需要在客户端计算
-const fetchStats = async () => {
-  const { data } = await postgrest
-    .from('posts')
-    .select('category:categories(id, name), view_count')
-    .eq('status', 'PUBLISHED')
+// src/hooks/use-categories.ts - useCategoriesWithPostCount hook
+export function useCategoriesWithPostCount() {
+  const [data, setData] = useState<CategoryWithPostCount[] | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  // 客户端聚合（仅适用于小数据量）
-  const stats = data?.reduce((acc, post) => {
-    const catId = post.category?.id ?? 'uncategorized'
-    const catName = post.category?.name ?? '未分类'
-    
-    if (!acc[catId]) {
-      acc[catId] = { categoryId: catId, categoryName: catName, postCount: 0, totalViews: 0 }
+  const fetchCategories = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      // 获取所有分类
+      const { data: categories } = await postgrest
+        .from('categories')
+        .select('*')
+        .order('sort_order', { ascending: true })
+
+      // PostgREST 聚合能力有限，需要逐个查询文章数量
+      const categoriesWithCount = await Promise.all(
+        (categories as DbCategory[]).map(async (category) => {
+          const { count } = await postgrest
+            .from('posts')
+            .select('*', { count: 'exact', head: true })
+            .eq('category_id', category.id)
+            .eq('status', 'PUBLISHED')
+
+          return {
+            ...toCategory(category),
+            postCount: count ?? 0,
+          }
+        })
+      )
+
+      setData(categoriesWithCount)
+    } catch (err) {
+      // 错误处理
+    } finally {
+      setIsLoading(false)
     }
-    acc[catId].postCount++
-    acc[catId].totalViews += post.view_count
-    
-    return acc
-  }, {} as Record<string, CategoryStats>)
+  }, [])
 
-  return Object.values(stats ?? {})
+  useEffect(() => { fetchCategories() }, [fetchCategories])
+
+  return { data, isLoading, refresh: fetchCategories }
 }
 ```
 
@@ -505,11 +662,34 @@ const getCachedPosts = unstable_cache(
 
 1. **类型安全**
    ```typescript
-   // 使用 openapi-typescript 生成类型
+   // 使用 Supabase CLI 生成类型（推荐）
+   npx supabase gen types typescript --local > src/types/database.ts
+   
+   // 或使用 openapi-typescript
    npx openapi-typescript http://localhost:3001/ -o src/types/postgrest.ts
    ```
 
-2. **错误处理**
+2. **数据转换**
+   ```typescript
+   // 定义转换函数处理 snake_case → camelCase
+   function transformPostWithAuthor(dbPost: DbPostWithAuthor): PostWithAuthor {
+     return {
+       id: dbPost.id,
+       title: dbPost.title,
+       coverImage: dbPost.cover_image,  // snake_case → camelCase
+       authorId: dbPost.author_id,
+       publishedAt: dbPost.published_at ? new Date(dbPost.published_at) : null,
+       // ...
+       author: {
+         id: dbPost.author.id,
+         name: dbPost.author.name,
+         avatarUrl: dbPost.author.avatar_url,
+       },
+     }
+   }
+   ```
+
+3. **错误处理**
    ```typescript
    const { data, error } = await postgrest.from('posts').select()
    if (error) {
@@ -518,13 +698,13 @@ const getCachedPosts = unstable_cache(
    }
    ```
 
-3. **请求优化**
+4. **请求优化**
    ```typescript
    // 只选择需要的字段
    .select('id, title, excerpt, published_at')
    
-   // 使用嵌入查询减少请求次数
-   .select('*, author:users(name)')
+   // 使用嵌入查询减少请求次数（注意外键约束名称）
+   .select('*, author:users!posts_author_id_fkey(id, name, avatar_url)')
    ```
 
 ### Server 端方案
