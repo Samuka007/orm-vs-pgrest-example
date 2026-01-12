@@ -10,9 +10,9 @@ resources:
 
 images:
 - name: ghcr.io/samuka007/orm-vs-pgrest-example
-  newTag: sha-37d64a9
+  newTag: sha-9fb0ea9
 - name: ghcr.io/samuka007/orm-vs-pgrest-example-migrate
-  newTag: sha-37d64a9
+  newTag: sha-9fb0ea9
 
 labels:
 - includeSelectors: true
