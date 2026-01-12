@@ -27,10 +27,10 @@ function formatDate(date: Date | null): string {
  */
 export function PostCard({ post }: PostCardProps) {
   return (
-    <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 dark:bg-gray-800 dark:shadow-gray-900/30">
       {/* 封面图片 */}
       {post.coverImage && (
-        <div className="aspect-video bg-gray-200 overflow-hidden">
+        <div className="aspect-video bg-gray-200 dark:bg-gray-700 overflow-hidden">
           <img
             src={post.coverImage}
             alt={post.title}
@@ -58,17 +58,17 @@ export function PostCard({ post }: PostCardProps) {
         </div>
 
         {/* 标题 */}
-        <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
           {post.title}
         </h2>
 
         {/* 摘要 */}
         {post.excerpt && (
-          <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{post.excerpt}</p>
         )}
 
         {/* 元信息 */}
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
             {/* 作者头像 */}
             {post.author.avatarUrl ? (
@@ -78,8 +78,8 @@ export function PostCard({ post }: PostCardProps) {
                 className="w-6 h-6 rounded-full"
               />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
-                <span className="text-xs text-gray-600">
+              <div className="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                <span className="text-xs text-gray-600 dark:text-gray-300">
                   {post.author.name.charAt(0)}
                 </span>
               </div>

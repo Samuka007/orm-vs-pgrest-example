@@ -17,7 +17,7 @@ interface SkeletonProps {
 function Skeleton({ className = '' }: SkeletonProps) {
   return (
     <div
-      className={`animate-pulse bg-gray-200 rounded ${className}`}
+      className={`animate-pulse bg-gray-200 dark:bg-gray-700 rounded ${className}`}
     />
   )
 }
@@ -27,7 +27,7 @@ function Skeleton({ className = '' }: SkeletonProps) {
  */
 export function PostCardSkeleton() {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/30 overflow-hidden">
       {/* 封面图片骨架 */}
       <Skeleton className="aspect-video" />
 
@@ -137,7 +137,7 @@ export function PostDetailSkeleton() {
  */
 export function CategoryCardSkeleton() {
   return (
-    <div className="p-4 bg-white rounded-lg shadow-sm">
+    <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/30">
       <Skeleton className="h-5 w-24 mb-2" />
       <Skeleton className="h-4 w-full mb-1" />
       <Skeleton className="h-4 w-3/4 mb-2" />
@@ -196,7 +196,7 @@ export function CommentListSkeleton({ count = 3 }: { count?: number }) {
  */
 export function StatsCardSkeleton() {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900/30 p-6">
       <div className="flex items-center justify-between">
         <div>
           <Skeleton className="h-4 w-16 mb-2" />

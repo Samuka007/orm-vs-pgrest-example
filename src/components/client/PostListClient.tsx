@@ -36,10 +36,10 @@ function formatDate(date: Date | null): string {
  */
 function ClientPostCard({ post }: { post: PostWithAuthor }) {
   return (
-    <article className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+    <article className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-gray-900/30 overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* 封面图片 */}
       {post.coverImage && (
-        <div className="aspect-video bg-gray-200 overflow-hidden">
+        <div className="aspect-video bg-gray-200 dark:bg-gray-700 overflow-hidden">
           <img
             src={post.coverImage}
             alt={post.title}
@@ -50,17 +50,17 @@ function ClientPostCard({ post }: { post: PostWithAuthor }) {
 
       <div className="p-6">
         {/* 标题 */}
-        <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
           {post.title}
         </h2>
 
         {/* 摘要 */}
         {post.excerpt && (
-          <p className="text-gray-600 mb-4 line-clamp-3">{post.excerpt}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{post.excerpt}</p>
         )}
 
         {/* 元信息 */}
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
           <div className="flex items-center gap-2">
             {/* 作者头像 */}
             {post.author.avatarUrl ? (
@@ -70,8 +70,8 @@ function ClientPostCard({ post }: { post: PostWithAuthor }) {
                 className="w-6 h-6 rounded-full"
               />
             ) : (
-              <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
-                <span className="text-xs text-gray-600">
+              <div className="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                <span className="text-xs text-gray-600 dark:text-gray-300">
                   {post.author.name.charAt(0)}
                 </span>
               </div>
@@ -181,8 +181,8 @@ function ClientPagination({
         disabled={currentPage <= 1}
         className={`px-3 py-2 rounded-md text-sm font-medium border ${
           currentPage <= 1
-            ? 'text-gray-400 bg-gray-100 border-gray-200 cursor-not-allowed'
-            : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'
+            ? 'text-gray-400 bg-gray-100 border-gray-200 cursor-not-allowed dark:text-gray-500 dark:bg-gray-800 dark:border-gray-700'
+            : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700'
         }`}
       >
         上一页
@@ -194,7 +194,7 @@ function ClientPagination({
           return (
             <span
               key={`ellipsis-${index}`}
-              className="px-3 py-2 text-sm text-gray-500"
+              className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400"
             >
               ...
             </span>
@@ -209,8 +209,8 @@ function ClientPagination({
             onClick={() => onPageChange(page)}
             className={`px-3 py-2 rounded-md text-sm font-medium border ${
               isCurrentPage
-                ? 'text-white bg-blue-600 border-blue-600'
-                : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'
+                ? 'text-white bg-blue-600 border-blue-600 dark:bg-blue-500 dark:border-blue-500'
+                : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700'
             }`}
             aria-current={isCurrentPage ? 'page' : undefined}
           >
@@ -225,8 +225,8 @@ function ClientPagination({
         disabled={currentPage >= totalPages}
         className={`px-3 py-2 rounded-md text-sm font-medium border ${
           currentPage >= totalPages
-            ? 'text-gray-400 bg-gray-100 border-gray-200 cursor-not-allowed'
-            : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50'
+            ? 'text-gray-400 bg-gray-100 border-gray-200 cursor-not-allowed dark:text-gray-500 dark:bg-gray-800 dark:border-gray-700'
+            : 'text-gray-700 bg-white border-gray-300 hover:bg-gray-50 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700'
         }`}
       >
         下一页
@@ -276,7 +276,7 @@ export function PostListClient({
     return (
       <div className="text-center py-12">
         <svg
-          className="mx-auto h-12 w-12 text-red-400"
+          className="mx-auto h-12 w-12 text-red-400 dark:text-red-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -288,8 +288,8 @@ export function PostListClient({
             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
           />
         </svg>
-        <h3 className="mt-2 text-sm font-medium text-gray-900">加载失败</h3>
-        <p className="mt-1 text-sm text-gray-500">
+        <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">加载失败</h3>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           {error?.message || '获取文章列表时发生错误'}
         </p>
       </div>
@@ -301,7 +301,7 @@ export function PostListClient({
     return (
       <div className="text-center py-12">
         <svg
-          className="mx-auto h-12 w-12 text-gray-400"
+          className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -313,7 +313,7 @@ export function PostListClient({
             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
           />
         </svg>
-        <h3 className="mt-2 text-sm font-medium text-gray-900">{emptyText}</h3>
+        <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">{emptyText}</h3>
       </div>
     )
   }
@@ -339,7 +339,7 @@ export function PostListClient({
       )}
 
       {/* 总数信息 */}
-      <div className="text-center text-sm text-gray-500">
+      <div className="text-center text-sm text-gray-500 dark:text-gray-400">
         共 {total} 篇文章，第 {page} / {totalPages} 页
       </div>
     </div>
