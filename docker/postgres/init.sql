@@ -38,28 +38,25 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public
 CREATE OR REPLACE FUNCTION grant_web_anon_select()
 RETURNS void AS $$
 DECLARE
-    public_grants TEXT;
-    api_grants TEXT;
+    table_record RECORD;
 BEGIN
     -- 授予 public schema 中所有表的 SELECT 权限
-    SELECT string_agg('GRANT SELECT ON public.' || quote_ident(tablename) || ' TO web_anon;', ' ')
-    INTO public_grants
-    FROM pg_tables
-    WHERE schemaname = 'public';
-    
-    IF public_grants IS NOT NULL THEN
-        EXECUTE public_grants;
-    END IF;
-    
+    FOR table_record IN
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'public'
+    LOOP
+        EXECUTE format('GRANT SELECT ON public.%I TO web_anon', table_record.tablename);
+    END LOOP;
+
     -- 授予 api schema 中所有表的 SELECT 权限
-    SELECT string_agg('GRANT SELECT ON api.' || quote_ident(tablename) || ' TO web_anon;', ' ')
-    INTO api_grants
-    FROM pg_tables
-    WHERE schemaname = 'api';
-    
-    IF api_grants IS NOT NULL THEN
-        EXECUTE api_grants;
-    END IF;
+    FOR table_record IN
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'api'
+    LOOP
+        EXECUTE format('GRANT SELECT ON api.%I TO web_anon', table_record.tablename);
+    END LOOP;
 END;
 $$ LANGUAGE plpgsql;
 
