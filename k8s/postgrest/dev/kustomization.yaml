@@ -4,9 +4,14 @@ kind: Kustomization
 namespace: cmp-dev
 
 resources:
+  - db-init-job.yaml
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+
+images:
+  - name: ghcr.io/samuka007/orm-vs-pgrest-example-migrate
+    newTag: main
 
 commonLabels:
   app: postgrest

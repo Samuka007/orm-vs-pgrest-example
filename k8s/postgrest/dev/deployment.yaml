@@ -39,13 +39,15 @@ spec:
               cpu: "200m"
           livenessProbe:
             httpGet:
-              path: /
+              path: /live
               port: 3000
             initialDelaySeconds: 10
             periodSeconds: 10
+            failureThreshold: 6
           readinessProbe:
             httpGet:
-              path: /
+              path: /ready
               port: 3000
             initialDelaySeconds: 5
             periodSeconds: 5
+            failureThreshold: 3
