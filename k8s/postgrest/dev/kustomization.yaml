@@ -11,7 +11,7 @@ resources:
 
 images:
   - name: ghcr.io/samuka007/orm-vs-pgrest-example-migrate
-    newTag: main
+    newTag: sha-389d038
 
 commonLabels:
   app: postgrest

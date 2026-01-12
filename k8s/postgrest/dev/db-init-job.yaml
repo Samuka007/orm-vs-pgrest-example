@@ -7,6 +7,7 @@ metadata:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
+  backoffLimit: 0
   ttlSecondsAfterFinished: 300
   template:
     spec:
@@ -18,7 +19,7 @@ spec:
           command: ['sh', '-c', 'until nc -z blog-postgres-rw 5432; do echo waiting for database; sleep 2; done']
       containers:
         - name: init
-          image: ghcr.io/samuka007/orm-vs-pgrest-example-migrate:sha-1e40d02
+          image: ghcr.io/samuka007/orm-vs-pgrest-example-migrate:sha-389d038
           env:
             - name: DATABASE_URL
               valueFrom:

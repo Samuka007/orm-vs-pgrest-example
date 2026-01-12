@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: blog-postgrest-dev
+  name: blog-postgrest-dev-1
   namespace: argocd
 spec:
   project: default
@@ -16,7 +16,7 @@ spec:
     namespace: cmp-dev-1
   syncPolicy:
     automated:
-      prune: true
-      selfHeal: true
+      prune: false
+      selfHeal: false
     syncOptions:
       - CreateNamespace=true
