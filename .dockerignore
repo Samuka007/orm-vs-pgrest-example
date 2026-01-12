@@ -1,0 +1,63 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+
+# Kubernetes
+k8s/
+
+# Documentation
+*.md
+docs/
+plans/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Logs
+*.log
+
+# Certificates
+*.pem
+
+# Vercel
+.vercel
+
+# Nix
+.direnv
+result
+result-*
+flake.lock
+flake.nix
+
+# Misc
+.envrc

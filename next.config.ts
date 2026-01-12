@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  // 启用 standalone 输出模式（Docker 部署必需）
+  output: 'standalone',
+
   // 启用严格模式
   reactStrictMode: true,
 
@@ -15,11 +18,6 @@ const nextConfig: NextConfig = {
         hostname: '**',
       },
     ],
-  },
-
-  // 环境变量
-  env: {
-    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   },
 }
 

@@ -1,0 +1,47 @@
+# Dockerfile.migrate
+# 用于运行 Prisma 迁移、seed 和 PostgREST 权限配置
+
+FROM node:22-alpine
+
+RUN apk add --no-cache libc6-compat postgresql16-client
+WORKDIR /app
+
+# 安装 pnpm
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+# 复制依赖文件
+COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma/
+COPY prisma.config.ts ./
+
+# 安装依赖（包括 devDependencies）
+RUN pnpm install --frozen-lockfile
+
+# 复制 init.sql
+COPY docker/postgres/init.sql ./init.sql
+
+# 创建初始化脚本
+RUN cat > /app/init-db.sh << 'EOF'
+#!/bin/sh
+set -e
+
+echo "🚀 开始数据库初始化..."
+
+echo "📦 运行 Prisma 迁移..."
+pnpm prisma migrate deploy
+
+echo "🌱 运行数据库 seed..."
+pnpm db:seed
+
+echo "🔐 配置 PostgREST 权限..."
+psql "$DATABASE_URL" -f /app/init.sql
+
+echo "✅ 授予表权限..."
+psql "$DATABASE_URL" -c "SELECT grant_web_anon_select();"
+
+echo "🎉 数据库初始化完成！"
+EOF
+
+RUN chmod +x /app/init-db.sh
+
+CMD ["/app/init-db.sh"]

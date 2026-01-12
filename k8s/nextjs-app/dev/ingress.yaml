@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextjs-app
+  namespace: cmp-dev
+  annotations:
+    kubernetes.io/ingress.class: cloudflare-tunnel
+    cloudflare-tunnel-ingress-controller.strrl.dev/backend-protocol: http
+spec:
+  rules:
+    - host: cmp-k8s-argocd-au.samuka007.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nextjs-app
+                port:
+                  name: http
