@@ -5,7 +5,7 @@ metadata:
   namespace: cmp-dev-1
   annotations:
     argocd.argoproj.io/sync-wave: "1" # 第二阶段：数据库就绪后执行迁移
-    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-options: Replace=true
 spec:
   backoffLimit: 0
   ttlSecondsAfterFinished: 300
