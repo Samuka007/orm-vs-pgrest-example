@@ -13,6 +13,46 @@ spec:
       labels:
         app: postgrest
     spec:
+      initContainers:
+        - name: wait-for-db-init
+          image: postgres:16-alpine
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: blog-postgres-app
+                  key: uri
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              echo "Waiting for database initialization..."
+
+              # Wait for database to be available
+              until pg_isready -d "$DATABASE_URL" 2>/dev/null; do
+                echo "Database not ready, waiting..."
+                sleep 2
+              done
+
+              echo "Database is ready, checking if tables exist..."
+
+              # Check if tables exist and web_anon has permissions
+              until psql "$DATABASE_URL" -tAc "SELECT COUNT(*) FROM pg_tables WHERE schemaname = 'public' AND tablename = 'users'" | grep -q '^1$'; do
+                echo "Tables not yet created, waiting..."
+                sleep 2
+              done
+
+              echo "Verifying web_anon permissions..."
+
+              # Verify web_anon has SELECT permission on users table
+              GRANTS=$(psql "$DATABASE_URL" -tAc "SELECT COUNT(*) FROM information_schema.role_table_grants WHERE grantee = 'web_anon' AND table_schema = 'public' AND privilege_type = 'SELECT'")
+
+              if [ "$GRANTS" -gt "0" ]; then
+                echo "✅ Database initialization complete, web_anon has permissions!"
+              else
+                echo "⚠️  Warning: web_anon permissions may not be set correctly, but proceeding..."
+              fi
       containers:
         - name: postgrest
           image: postgrest/postgrest:v12.2.3
