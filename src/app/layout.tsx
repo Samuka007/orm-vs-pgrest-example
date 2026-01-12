@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Link from 'next/link'
 import './globals.css'
 
 // 配置 Inter 字体
@@ -41,7 +42,7 @@ export default function RootLayout({
             <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
               <div className="flex items-center gap-8">
                 {/* Logo */}
-                <a href="/" className="flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
+                <Link href="/" className="flex items-center gap-2 font-semibold text-gray-900 dark:text-white">
                   <svg
                     className="h-8 w-8 text-primary-500"
                     fill="none"
@@ -56,22 +57,22 @@ export default function RootLayout({
                     />
                   </svg>
                   <span>DB Frontend</span>
-                </a>
+                </Link>
 
                 {/* 导航链接 */}
                 <div className="hidden items-center gap-6 md:flex">
-                  <a
+                  <Link
                     href="/client"
                     className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                   >
                     Client 端
-                  </a>
-                  <a
+                  </Link>
+                  <Link
                     href="/server"
                     className="text-sm font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                   >
                     Server 端
-                  </a>
+                  </Link>
                 </div>
               </div>
 
